@@ -1,0 +1,24 @@
+{
+  "name": "volunteer-management-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "install": "^0.13.0",
+    "mongo": "^0.1.0",
+    "npm": "^11.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
