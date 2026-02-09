@@ -31,6 +31,14 @@ async function run() {
     const volunteerCollection = client.db('volunteerManagementDB').collection('volunteer');
 
     //volunteer related API
+
+    //read volunteer
+    app.get('/volunteers-posts', async (req, res) => {
+      const cursor = volunteerCollection.find();
+      const volunteers = await cursor.toArray();
+      res.send(volunteers);
+    });
+
     //add volunteer
     app.post('/volunteers-posts', async (req, res) => {
       const volunteer = req.body;
