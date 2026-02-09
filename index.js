@@ -43,10 +43,33 @@ async function run() {
     //volunteer related API
 
     //read volunteer
+    // app.get('/volunteers-posts', async (req, res) => {
+    //   const cursor = volunteerCollection.find();
+    //   const volunteers = await cursor.toArray();
+    //   res.send(volunteers);
+    // });
+
+    //search volunteer
     app.get('/volunteers-posts', async (req, res) => {
-      const cursor = volunteerCollection.find();
-      const volunteers = await cursor.toArray();
-      res.send(volunteers);
+      const search = req.query.search;
+      let query = {};
+
+      if (search) {
+        query = {
+          title: {
+            $regex: search,
+            $options: 'i' // case-insensitive
+          }
+        };
+      }
+
+      try {
+        const cursor = volunteerCollection.find(query);
+        const volunteers = await cursor.toArray();
+        res.send(volunteers);
+      } catch (error) {
+        res.status(500).send({ message: "Search failed" });
+      }
     });
 
     app.get('/volunteers-posts/:id', async (req, res) => {
@@ -56,10 +79,7 @@ async function run() {
       res.send(volunteer);
     });
 
-    // Example Server-side Logic
-    // Inside your async function run() { ... }
-
-    // CHANGE THIS:
+    //volunteer request related API
     app.post('/volunteer-requests', async (req, res) => {
       const request = req.body;
 
@@ -79,6 +99,10 @@ async function run() {
 
       res.send(result);
     });
+
+    
+
+
     //add volunteer
     app.post('/volunteers-posts', async (req, res) => {
       const volunteer = req.body;
