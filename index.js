@@ -45,8 +45,7 @@ async function run() {
         });
 
         // 3. Get Posts by User Email (For Manage Page)
-        // In your index.js inside the run() function
-        // Update this route in your backend index.js
+
         app.get('/my-volunteer-posts/:email', async (req, res) => {
             const email = req.params.email;
 
@@ -66,6 +65,33 @@ async function run() {
             }
         });
 
+        //update post
+        // 6. Update Post Route
+        app.put('/volunteers-posts/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedPost = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            
+
+            const updatePost = {
+                $set: {
+                    thumbnail: updatedPost.thumbnail,
+                    title: updatedPost.title,
+                    description: updatedPost.description,
+                    category: updatedPost.category,
+                    location: updatedPost.location,
+                    volunteersNeeded: updatedPost.volunteersNeeded,
+                    deadline: updatedPost.deadline,
+                    organizerName: updatedPost.organizerName,
+                    organizerEmail: updatedPost.organizerEmail
+                },
+            };
+            const result = await volunteerCollection.updateOne(filter, updatePost, options);
+            res.send(result);
+        });
+
+        
         // 4. Delete Post
         app.delete('/volunteers-posts/:id', async (req, res) => {
             const id = req.params.id;
