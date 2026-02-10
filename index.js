@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -11,20 +13,26 @@ app.use(cors({
         'https://volunteer-management-1de8f.web.app',
         'https://volunteer-management-1de8f.firebaseapp.com',
         'http://localhost:5173'
-    ]
+    ],
+    credentials: true,
 }));
 app.use(express.json());
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deftcj8.mongodb.net/?appName=Cluster0`;
 const client = new MongoClient(uri, {
     serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true }
 });
 
+
 async function run() {
     try {
         const volunteerCollection = client.db('volunteerManagementDB').collection('volunteer');
         const userCollection = client.db('volunteerManagementDB').collection('user');
         const requestCollection = client.db('volunteerManagementDB').collection('request');
+
+        
+
 
         // 1. Unified Search & Read Route
         app.get('/volunteers-posts', async (req, res) => {
@@ -149,7 +157,7 @@ async function run() {
                 res.status(500).send({ message: "Error fetching requests" });
             }
         });
-        
+
 
         // 2. Cancel a Volunteer Request
         app.delete('/volunteer-requests/:id', async (req, res) => {
