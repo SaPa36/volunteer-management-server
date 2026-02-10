@@ -53,6 +53,17 @@ async function run() {
         });
 
 
+        app.post('/logout', async (req, res) => {
+            res
+                .clearCookie('token', {
+                    maxAge: 0,
+                    secure: true, // MUST match the setting in /jwt
+                    sameSite: 'none', // MUST match the setting in /jwt
+                })
+                .send({ success: true, message: 'Logged out successfully' });
+        });
+
+
         // 1. Unified Search & Read Route
         app.get('/volunteers-posts', async (req, res) => {
             const search = req.query.search;
