@@ -108,6 +108,8 @@ async function run() {
             res.send(result);
         });
 
+
+
         //requests related API
         app.post('/volunteer-requests', async (req, res) => {
             const request = req.body;
@@ -126,6 +128,44 @@ async function run() {
             // Use the correct collection variable name here:
             const updateResult = await volunteerCollection.updateOne(filter, updateDoc);
 
+            res.send(result);
+        });
+
+        // --- Added/Updated Requests API ---
+
+        // 1. Get all requests for a specific volunteer (User's applications)
+        // In your server index.js, inside the run() function:
+
+        app.get('/my-volunteer-requests/:email', async (req, res) => {
+            const email = req.params.email;
+
+            // Using volunteer_email to match your form data precisely
+            const query = { volunteer_email: email };
+
+            try {
+                const result = await requestCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching requests" });
+            }
+        });
+        
+
+        // 2. Cancel a Volunteer Request
+        app.delete('/volunteer-requests/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            // Optional: If you want to increase the 'volunteersNeeded' count back up when someone cancels:
+            /*
+            const request = await requestCollection.findOne(query);
+            if (request) {
+                const filter = { _id: new ObjectId(request.postId) };
+                await volunteerCollection.updateOne(filter, { $inc: { volunteersNeeded: 1 } });
+            }
+            */
+
+            const result = await requestCollection.deleteOne(query);
             res.send(result);
         });
 
