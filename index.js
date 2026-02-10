@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -17,6 +19,7 @@ app.use(cors({
     credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deftcj8.mongodb.net/?appName=Cluster0`;
@@ -31,7 +34,23 @@ async function run() {
         const userCollection = client.db('volunteerManagementDB').collection('user');
         const requestCollection = client.db('volunteerManagementDB').collection('request');
 
-        
+        //auth related api
+        app.post('/jwt', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+
+            //console.log('JWT TOKEN:', token);
+
+            res
+                .cookie('token', token, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'none',
+
+                })
+                .send({ success: true});
+        });
 
 
         // 1. Unified Search & Read Route
