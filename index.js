@@ -22,8 +22,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        const db = client.db('volunteerManagementDB');
-        const volunteerCollection = db.collection('volunteer');
+        const volunteerCollection = client.db('volunteerManagementDB').collection('volunteer');
+        const userCollection = client.db('volunteerManagementDB').collection('user');
+        const requestCollection = client.db('volunteerManagementDB').collection('request');
 
         // 1. Unified Search & Read Route
         app.get('/volunteers-posts', async (req, res) => {
@@ -72,7 +73,7 @@ async function run() {
             const updatedPost = req.body;
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
-            
+
 
             const updatePost = {
                 $set: {
@@ -91,7 +92,7 @@ async function run() {
             res.send(result);
         });
 
-        
+
         // 4. Delete Post
         app.delete('/volunteers-posts/:id', async (req, res) => {
             const id = req.params.id;
@@ -104,6 +105,35 @@ async function run() {
         app.post('/volunteers-posts', async (req, res) => {
             const post = req.body;
             const result = await volunteerCollection.insertOne(post);
+            res.send(result);
+        });
+
+        //requests related API
+        app.post('/volunteer-requests', async (req, res) => {
+            const request = req.body;
+
+            // 1. Save the volunteer request to your 'requestCollection'
+            const result = await requestCollection.insertOne(request);
+
+            // 2. Update the main post in 'volunteerCollection' (Decrease slots)
+            // Ensure "request.postId" is passed correctly from frontend
+            const filter = { _id: new ObjectId(request.postId) };
+
+            const updateDoc = {
+                $inc: { volunteersNeeded: -1 }
+            };
+
+            // Use the correct collection variable name here:
+            const updateResult = await volunteerCollection.updateOne(filter, updateDoc);
+
+            res.send(result);
+        });
+
+
+        //users related API
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
             res.send(result);
         });
 
